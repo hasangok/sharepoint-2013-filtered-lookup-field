@@ -289,7 +289,47 @@ namespace Dev4Side.SP2013.FilteredLookup
 
         return fieldControl;
       }
-    } 
-    #endregion
-  }
+    }
+        #endregion
+
+
+        #region fix for weird representation in list views
+        /// <summary>
+        /// The issue is described in many links such as
+        /// https://stackoverflow.com/questions/19954407/how-can-i-get-my-custom-field-type-lookup-to-render-in-list-view-on-sharepoint
+        /// and
+        /// https://social.msdn.microsoft.com/Forums/vstudio/en-US/1d01c560-c634-4320-80df-135bf9972536/custom-field-type-that-inherits-from-spfieldlookup?forum=sharepointdevelopment
+        /// The fix was taken from https://sptalks.wordpress.com/2014/04/17/custom-spfieldlookup-displaypattern-bug/
+        /// </summary>
+        public override string JSLink
+        {
+            get
+            {
+                if (CurrentControlMode == SPControlMode.Invalid || CurrentControlMode == SPControlMode.Display)
+                    return "clienttemplates.js";
+
+                return base.JSLink;
+            }
+            set
+            {
+                base.JSLink = value;
+            }
+        }
+
+        public SPControlMode CurrentControlMode
+        {
+            get
+            {
+                try
+                {
+                    return this.FieldRenderingControl.ControlMode;
+                }
+                catch
+                {
+                    return SPControlMode.Invalid;
+                }
+            }
+        } 
+        #endregion
+    }
 }
